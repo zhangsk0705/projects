@@ -1,0 +1,131 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: seata-order-server
+
+  cloud:
+#    alibaba:
+#      seata:
+#        tx-service-group: default_tx_group # seata \u670D\u52A1\u4E8B\u52A1\u5206\u7EC4
+    #nacos\u76F8\u5173\u914D\u7F6E
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: 7610c613-f7c3-41b3-a67a-93c0a7e93268
+        group: seata-test
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: 7610c613-f7c3-41b3-a67a-93c0a7e93268
+        group: seata-test
+
+  datasource:
+    #\u6570\u636E\u6E90\u57FA\u672C\u914D\u7F6E
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/seata_order?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    type: com.alibaba.druid.pool.DruidDataSource
+    #\u6570\u636E\u6E90\u5176\u4ED6\u914D\u7F6E
+    druid:
+      #\u914D\u7F6E\u521D\u59CB\u5316\u5927\u5C0F\u3001\u6700\u5C0F\u3001\u6700\u5927\u7EBF\u7A0B\u6570
+      initialSize: 5
+      minIdle: 5
+      #CPU\u6838\u6570+1\uFF0C\u4E5F\u53EF\u4EE5\u5927\u4E9B\u4F46\u4E0D\u8981\u8D85\u8FC720\uFF0C\u6570\u636E\u5E93\u52A0\u9501\u65F6\u8FDE\u63A5\u8FC7\u591A\u6027\u80FD\u4E0B\u964D
+      maxActive: 20
+      #\u6700\u5927\u7B49\u5F85\u65F6\u95F4\uFF0C\u5185\u7F51\uFF1A800\uFF0C\u5916\u7F51\uFF1A1200\uFF08\u4E09\u6B21\u63E1\u624B1s\uFF09
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      #\u914D\u7F6E\u4E00\u4E2A\u8FDE\u63A5\u5728\u6C60\u4E2D\u6700\u5927\u7A7A\u95F4\u65F6\u95F4\uFF0C\u5355\u4F4D\u662F\u6BEB\u79D2
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      #\u8BBE\u7F6E\u4ECE\u8FDE\u63A5\u6C60\u83B7\u53D6\u8FDE\u63A5\u65F6\u662F\u5426\u68C0\u67E5\u8FDE\u63A5\u6709\u6548\u6027\uFF0Ctrue\u68C0\u67E5\uFF0Cfalse\u4E0D\u68C0\u67E5
+      testOnBorrow: true
+      #\u8BBE\u7F6E\u4ECE\u8FDE\u63A5\u6C60\u5F52\u8FD8\u8FDE\u63A5\u65F6\u662F\u5426\u68C0\u67E5\u8FDE\u63A5\u6709\u6548\u6027\uFF0Ctrue\u68C0\u67E5\uFF0Cfalse\u4E0D\u68C0\u67E5
+      testOnReturn: true
+      #\u53EF\u4EE5\u652F\u6301PSCache\uFF08\u63D0\u5347\u5199\u5165\u3001\u67E5\u8BE2\u6548\u7387\uFF09
+      poolPreparedStatements: true
+      #\u914D\u7F6E\u76D1\u63A7\u7EDF\u8BA1\u62E6\u622A\u7684filters\uFF0C\u53BB\u6389\u540E\u76D1\u63A7\u754C\u9762sql\u65E0\u6CD5\u7EDF\u8BA1\uFF0C'wall'\u7528\u4E8E\u9632\u706B\u5899
+      filters: stat,wall,log4j
+      #\u4FDD\u6301\u957F\u8FDE\u63A5
+      keepAlive: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      useGlobalDataSourceStat: true
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+
+
+feign:
+  hystrix:
+    #\u5F00\u542Ffeign\u8C03\u7528\u65F6\u7684\u670D\u52A1\u4E2D\u65AD\u5904\u7406\u673A\u5236
+    enabled: true
+  client:
+    config:
+      default:
+        #\u8BBE\u7F6E feign \u8FDE\u63A5\u8D85\u65F6\u65F6\u95F4
+        connectTimeout: 3000
+        #\u8BBE\u7F6E feign \u8BFB\u53D6\u8D85\u65F6\u65F6\u95F4
+        readTimeout: 3000
+
+#feignClient \u8C03\u7528\u670D\u52A1\u540D\u79F0+\u5730\u5740
+interface:
+  storage:
+    serverName: seata-storage-server
+    serverHost: 127.0.0.1:9002
+  account:
+    serverName: seata-account-server
+    serverHost: 127.0.0.1:9003
+
+#\u7194\u65AD\u8D85\u65F6\u65F6\u95F4
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+
+ribbon:
+  #\u8BF7\u6C42\u8FDE\u63A5\u7684\u8D85\u65F6\u65F6\u95F4
+  ConnectTimeout: 60000
+  #\u8BF7\u6C42\u5904\u7406\u7684\u8D85\u65F6\u65F6\u95F4
+  ReadTimeout: 60000
+  #\u5BF9\u5F53\u524D\u5B9E\u4F8B\u7684\u91CD\u8BD5\u6B21\u6570
+  MaxAutoRetries: 0
+  #\u5207\u6362\u5B9E\u4F8B\u7684\u91CD\u8BD5\u6B21\u6570 1
+  MaxAutoRetriesNextServer: 1
+
+#\u5206\u5E03\u5F0F\u4E8B\u52A1 seata \u914D\u7F6E
+seata:
+#  service:
+#    vgroup-mapping:
+      #default_tx_group\u5206\u7EC4\u540D\u79F0\u5FC5\u987B\u8981\u8DDFtx-service-group\u7684\u503C\u4E00\u6837
+#      default_tx_group: default
+  #\u6307\u5B9A\u4E8B\u52A1\u5206\u7EC4 \u5206\u7EC4\u5FC5\u987B\u5728 nacos seataServer.properties\u914D\u7F6E\u4E2D\u6709
+  tx-service-group: default_tx_group
+  config:
+    # \u914D\u7F6Eseata\u914D\u7F6E\u4E2D\u5FC3\uFF0C\u544A\u8BC9\u6211\u4EEC\u7684seata client\u8BFB\u53D6\u6211\u4EEC\u7684seata server\uFF08TC\uFF09\u7684\u914D\u7F6E
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      group: seata-test
+      namespace: 7610c613-f7c3-41b3-a67a-93c0a7e93268
+      username: nacos
+      password: nacos
+  registry:
+    # \u914D\u7F6Eseata\u6CE8\u518C\u4E2D\u5FC3\uFF0C\u544A\u8BC9\u6211\u4EEC\u7684seata client\u600E\u4E48\u53BB\u8BBF\u95EE\u6211\u4EEC\u7684seata server\uFF08TC\uFF09
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: seata-test
+      namespace: 7610c613-f7c3-41b3-a67a-93c0a7e93268
+      username: nacos
+      password: nacos
+
+# seata \u65E5\u5FD7\u914D\u7F6E
+logging:
+  level:
+    io:
+      seata: info
