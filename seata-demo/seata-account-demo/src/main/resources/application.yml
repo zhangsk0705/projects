@@ -6,7 +6,7 @@ spring:
     name: seata-account-server
 
   cloud:
-    #nacos\u76F8\u5173\u914D\u7F6E
+    #nacos相关配置
     nacos:
       discovery:
         server-addr: localhost:8848
@@ -18,47 +18,47 @@ spring:
         group: seata-test
 
   datasource:
-    #\u6570\u636E\u6E90\u57FA\u672C\u914D\u7F6E
+    #数据源基本配置
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/seata_account?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
     type: com.alibaba.druid.pool.DruidDataSource
-    #\u6570\u636E\u6E90\u5176\u4ED6\u914D\u7F6E
+    #数据源其他配置
     druid:
-      #\u914D\u7F6E\u521D\u59CB\u5316\u5927\u5C0F\u3001\u6700\u5C0F\u3001\u6700\u5927\u7EBF\u7A0B\u6570
+      #配置初始化大小、最小、最大线程数
       initialSize: 5
       minIdle: 5
-      #CPU\u6838\u6570+1\uFF0C\u4E5F\u53EF\u4EE5\u5927\u4E9B\u4F46\u4E0D\u8981\u8D85\u8FC720\uFF0C\u6570\u636E\u5E93\u52A0\u9501\u65F6\u8FDE\u63A5\u8FC7\u591A\u6027\u80FD\u4E0B\u964D
+      #CPU核数+1，也可以大些但不要超过20，数据库加锁时连接过多性能下降
       maxActive: 20
-      #\u6700\u5927\u7B49\u5F85\u65F6\u95F4\uFF0C\u5185\u7F51\uFF1A800\uFF0C\u5916\u7F51\uFF1A1200\uFF08\u4E09\u6B21\u63E1\u624B1s\uFF09
+      #最大等待时间，内网：800，外网：1200（三次握手1s）
       maxWait: 60000
       timeBetweenEvictionRunsMillis: 60000
-      #\u914D\u7F6E\u4E00\u4E2A\u8FDE\u63A5\u5728\u6C60\u4E2D\u6700\u5927\u7A7A\u95F4\u65F6\u95F4\uFF0C\u5355\u4F4D\u662F\u6BEB\u79D2
+      #配置一个连接在池中最大空间时间，单位是毫秒
       minEvictableIdleTimeMillis: 300000
       validationQuery: SELECT 1
       testWhileIdle: true
-      #\u8BBE\u7F6E\u4ECE\u8FDE\u63A5\u6C60\u83B7\u53D6\u8FDE\u63A5\u65F6\u662F\u5426\u68C0\u67E5\u8FDE\u63A5\u6709\u6548\u6027\uFF0Ctrue\u68C0\u67E5\uFF0Cfalse\u4E0D\u68C0\u67E5
+      #设置从连接池获取连接时是否检查连接有效性，true检查，false不检查
       testOnBorrow: true
-      #\u8BBE\u7F6E\u4ECE\u8FDE\u63A5\u6C60\u5F52\u8FD8\u8FDE\u63A5\u65F6\u662F\u5426\u68C0\u67E5\u8FDE\u63A5\u6709\u6548\u6027\uFF0Ctrue\u68C0\u67E5\uFF0Cfalse\u4E0D\u68C0\u67E5
+      #设置从连接池归还连接时是否检查连接有效性，true检查，false不检查
       testOnReturn: true
-      #\u53EF\u4EE5\u652F\u6301PSCache\uFF08\u63D0\u5347\u5199\u5165\u3001\u67E5\u8BE2\u6548\u7387\uFF09
+      #可以支持PSCache（提升写入、查询效率）
       poolPreparedStatements: true
-      #\u914D\u7F6E\u76D1\u63A7\u7EDF\u8BA1\u62E6\u622A\u7684filters\uFF0C\u53BB\u6389\u540E\u76D1\u63A7\u754C\u9762sql\u65E0\u6CD5\u7EDF\u8BA1\uFF0C'wall'\u7528\u4E8E\u9632\u706B\u5899
+      #配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
       filters: stat,wall,log4j
-      #\u4FDD\u6301\u957F\u8FDE\u63A5
+      #保持长连接
       keepAlive: true
       maxPoolPreparedStatementPerConnectionSize: 20
       useGlobalDataSourceStat: true
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
 
-#\u5206\u5E03\u5F0F\u4E8B\u52A1 seata \u914D\u7F6E
+#分布式事务 seata 配置
 seata:
   service:
     vgroup-mapping:
-      #default_tx_group\u5206\u7EC4\u540D\u79F0\u5FC5\u987B\u8981\u8DDFtx-service-group\u7684\u503C\u4E00\u6837
+      #default_tx_group分组名称必须要跟tx-service-group的值一样
       default_tx_group: default
-  #\u6307\u5B9A\u4E8B\u52A1\u5206\u7EC4 \u5206\u7EC4\u5FC5\u987B\u5728 nacos seataServer.properties\u914D\u7F6E\u4E2D\u6709
+  #指定事务分组 分组必须在 nacos seataServer.properties配置中有
   tx-service-group: default_tx_group
   config:
     type: nacos
@@ -78,7 +78,7 @@ seata:
       username: nacos
       password: nacos
 
-# seata \u65E5\u5FD7\u914D\u7F6E
+# seata 日志配置
 logging:
   level:
     io:
