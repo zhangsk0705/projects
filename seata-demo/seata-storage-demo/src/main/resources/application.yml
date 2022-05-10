@@ -21,7 +21,7 @@ spring:
         group: seata-test
 
   datasource:
-    #\u6570\u636E\u6E90\u57FA\u672C\u914D\u7F6E
+    #数据源基本配置
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
