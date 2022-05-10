@@ -8,8 +8,8 @@ spring:
   cloud:
     alibaba:
       seata:
-        tx-service-group: default_tx_group # seata \u670D\u52A1\u4E8B\u52A1\u5206\u7EC4
-    #nacos\u76F8\u5173\u914D\u7F6E
+        tx-service-group: default_tx_group # seata 服务事务分组
+    #nacos相关配置
     nacos:
       discovery:
         server-addr: localhost:8848
